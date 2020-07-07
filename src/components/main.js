@@ -21,65 +21,72 @@ export default () => {
   const [selectedBrandsTerms, setSelectedBrandsTerms] = useState("");
   const [selectedStyles, setSelectedStyles] = useState("");
 
-  useEffect(() => {
+  const fetchData = async () => {
+
     setIsLoading(true);
-    const fetchData = async () => {
-      const response = await fetchSearchs();
+    const response = await fetchSearchs();
 
-      const { pathname } = history.location;
+    const { pathname } = history.location;
 
-      const initialIndexSelectedTerms = pathname.indexOf("/s-");
-      const initialIndexSelectedBrandsTerms = pathname.indexOf("/b-");
-      const initialIndexSelectedStyles = pathname.indexOf("/st-");
+    const initialIndexSelectedTerms = pathname.indexOf("/s-");
+    const initialIndexSelectedBrandsTerms = pathname.indexOf("/b-");
+    const initialIndexSelectedStyles = pathname.indexOf("/st-");
 
-      const responseTerms = response.find((item) => item.type === "terms").data;
-      const responseBrandsTerms = response.find(
-        (item) => item.type === "brands_terms"
-      ).data;
-      const responseStyles = response.find((item) => item.type === "styles")
-        .data;
+    const lastIndexSelectedTerms = pathname.indexOf("/", initialIndexSelectedTerms + 1);
+    const lastIndexSelectedBrandsTerms = pathname.indexOf("/", initialIndexSelectedBrandsTerms + 1);
+    const lastIndexSelectedStyles = pathname.indexOf("/", initialIndexSelectedStyles + 1);
 
-      setTerms([
-        { slug: "notSelected", key: 0, label: "select terms" },
-        ...responseTerms,
-      ]);
-      setBrandsTerms([
-        { slug: "notSelected", key: 0, label: "select brands berms" },
-        ...responseBrandsTerms,
-      ]);
-      setStyles([
-        { slug: "notSelected", key: 0, label: "select styles" },
-        ...responseStyles,
-      ]);
+    const responseTerms = response.find((item) => item.type === "terms").data;
+    const responseBrandsTerms = response.find(
+      (item) => item.type === "brands_terms"
+    ).data;
+    const responseStyles = response.find((item) => item.type === "styles")
+      .data;
 
-      const initialSelectedTerms = pathname.slice(
-        initialIndexSelectedTerms + 3,
-        initialIndexSelectedBrandsTerms
-      );
-      const initialSelectedBrandsTerms = pathname.slice(
-        initialIndexSelectedBrandsTerms + 3,
-        initialIndexSelectedStyles
-      );
-      const initialSelectedStyles = pathname.slice(
-        initialIndexSelectedStyles + 4
-      );
+    setTerms([
+      { slug: "notSelected", key: 0, label: "select terms" },
+      ...responseTerms,
+    ]);
+    setBrandsTerms([
+      { slug: "notSelected", key: 0, label: "select brands berms" },
+      ...responseBrandsTerms,
+    ]);
+    setStyles([
+      { slug: "notSelected", key: 0, label: "select styles" },
+      ...responseStyles,
+    ]);
 
-      setSelectedTerms(
-        initialIndexSelectedTerms === -1 ? "notSelected" : initialSelectedTerms
-      );
-      setSelectedBrandsTerms(
-        initialIndexSelectedBrandsTerms === -1
-          ? "notSelected"
-          : initialSelectedBrandsTerms
-      );
-      setSelectedStyles(
-        initialIndexSelectedStyles === -1
-          ? "notSelected"
-          : initialSelectedStyles
-      );
-      setIsLoading(false);
-    };
-    fetchData();
+    const initialSelectedTerms = pathname.slice(
+      initialIndexSelectedTerms + 3,
+      lastIndexSelectedTerms === -1 ? undefined : lastIndexSelectedTerms
+    );
+    const initialSelectedBrandsTerms = pathname.slice(
+      initialIndexSelectedBrandsTerms + 3,
+      lastIndexSelectedBrandsTerms === -1 ? undefined : lastIndexSelectedBrandsTerms
+    );
+    const initialSelectedStyles = pathname.slice(
+      initialIndexSelectedStyles + 4,
+      lastIndexSelectedStyles === -1 ? undefined : lastIndexSelectedStyles
+    );
+
+    setSelectedTerms(
+      initialIndexSelectedTerms === -1 ? "notSelected" : initialSelectedTerms
+    );
+    setSelectedBrandsTerms(
+      initialIndexSelectedBrandsTerms === -1
+        ? "notSelected"
+        : initialSelectedBrandsTerms
+    );
+    setSelectedStyles(
+      initialIndexSelectedStyles === -1
+        ? "notSelected"
+        : initialSelectedStyles
+    );
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+   fetchData()
   }, []);
 
   useEffect(() => {
